@@ -118,7 +118,7 @@ int main() {
 	//Link all the stages together
 	glLinkProgram(shaderProgram);
 	
-	//Check for linking errors
+	//Check for linking errors 
 	int success;
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
