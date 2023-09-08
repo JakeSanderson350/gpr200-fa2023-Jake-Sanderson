@@ -60,8 +60,13 @@ int main() {
 	//Tell vao to pull vertex data from vbo
 
 	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0); //change to float * 7 for multiple vertex atttributes
 	glEnableVertexAttribArray(0);
+
+	//color stuff
+	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
+	//glEnableVertexAttribArray(1);
+
 
 	//Vertex Buffer Object
 	unsigned int vbo;
@@ -137,7 +142,52 @@ int main() {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		
+		//Change mesh opt
+		glBindVertexArray(shaderProgram);
+		//change material opt
+		glUseProgram(shaderProgram);
+
+		//Draw
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
+}
+
+
+//Creates a new vertex array object with vertex data
+unsigned int createVAO(float* vertexData, int numVertices)
+{
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	//Tell vao to pull vertex data from vbo
+
+	//Define position attribute (3 floats)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0); //change to float * 7 for multiple vertex atttributes
+	glEnableVertexAttribArray(0);
+
+	//color stuff
+	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
+	//glEnableVertexAttribArray(1);
+
+	//Vertex Buffer Object
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//Allocate space for + send vertex data to GPU.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices, vertices, GL_STATIC_DRAW);
+
+	return vao;
+}
+
+
+// Creates a new shader of a given type.
+// Possible types: GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, etc
+// Returns id of the shader object
+unsigned int createShader(GLenum shaderType, const char* sourceCode)
+{
+
 }
