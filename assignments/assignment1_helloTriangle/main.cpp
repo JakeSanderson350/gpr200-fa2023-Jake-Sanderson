@@ -54,103 +54,31 @@ int main() {
 		return 1;
 	}
 
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	//Tell vao to pull vertex data from vbo
+	//Creates a new vertex array object with vertex data
+	unsigned int createVAO(float* vertexData, int numVertices);
 
-	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0); //change to float * 7 for multiple vertex atttributes
-	glEnableVertexAttribArray(0);
-
-	//color stuff
-	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
-	//glEnableVertexAttribArray(1);
-
-
-	//Vertex Buffer Object
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//Create a new vertex shader object
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//Supply the shader object with source code
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	//Compile the shader object
-	glCompileShader(vertexShader);
-
-	//glCompileShader(vertexShader)
-	//...
-	int success;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		//512 is an arbitrary length, but should be plenty of characters for our error message.
-		char infoLog[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("Failed to compile shader: %s", infoLog);
-	}
-
-	//Create a new fragment shader object
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//Supply the shader object with source code
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	//Compile the shader object
-	glCompileShader(fragmentShader);
-
-	//glCompileShader(fragmentShader)
-	//...
-	int success;
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		//512 is an arbitrary length, but should be plenty of characters for our error message.
-		char infoLog[512];
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		printf("Failed to compile shader: %s", infoLog);
-	}
-
+	// Creates a new shader of a given type.
+	// Possible types: GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, etc
+	// Returns id of the shader object
 	unsigned int createShader(GLenum shaderType, const char* sourceCode);
-	
-	unsigned int vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSource);
-	unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
-	unsigned int shaderProgram = glCreateProgram();
-	//Attach each stage
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	//Link all the stages together
-	glLinkProgram(shaderProgram);
-	
-	//Check for linking errors 
-	int success;
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		char infoLog[512];
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		printf("Failed to link shader program: %s", infoLog);
-	}
-	//The linked program now contains our compiled code, so we can delete these intermediate objects
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	//Creates a new shader program with vertex + fragment stages
+	//Returns id of new shader program if successful, 0 if failed
+	unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 
 
+	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
+	unsigned int vao = createVAO(vertices, 3);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
-		//Change mesh opt
-		glBindVertexArray(shaderProgram);
-		//change material opt
-		glUseProgram(shaderProgram);
-
-		//Draw
+		glUseProgram(shader);
+		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-		
+
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
@@ -166,7 +94,7 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	//Tell vao to pull vertex data from vbo
 
 	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0); //change to float * 7 for multiple vertex atttributes
+	glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0); //change to float * 7 for multiple vertex atttributes
 	glEnableVertexAttribArray(0);
 
 	//color stuff
@@ -178,7 +106,7 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices, vertexData, GL_STATIC_DRAW);
 
 	return vao;
 }
@@ -189,5 +117,50 @@ unsigned int createVAO(float* vertexData, int numVertices)
 // Returns id of the shader object
 unsigned int createShader(GLenum shaderType, const char* sourceCode)
 {
+	//Create a new vertex shader object
+	unsigned int newShader = glCreateShader(shaderType);
+	//Supply the shader object with source code
+	glShaderSource(newShader, 1, &sourceCode, NULL);
+	//Compile the shader object
+	glCompileShader(newShader);
 
+	int success;
+	glGetShaderiv(newShader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		//512 is an arbitrary length, but should be plenty of characters for our error message.
+		char infoLog[512];
+		glGetShaderInfoLog(newShader, 512, NULL, infoLog);
+		printf("Failed to compile shader: %s", infoLog);
+	}
+
+	return newShader;
+}
+
+//Creates a new shader program with vertex + fragment stages
+//Returns id of new shader program if successful, 0 if failed
+unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource)
+{
+	unsigned int vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSource);
+	unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+	unsigned int shaderProgram = glCreateProgram();
+	//Attach each stage
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	//Link all the stages together
+	glLinkProgram(shaderProgram);
+
+	//Check for linking errors 
+	int success;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	if (!success) {
+		char infoLog[512];
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		printf("Failed to link shader program: %s", infoLog);
+	}
+	//The linked program now contains our compiled code, so we can delete these intermediate objects
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	return shaderProgram;
 }
