@@ -28,7 +28,7 @@ const char* fragmentShaderSource = R"(
 	#version 450
 	out vec4 FragColor;
 	void main(){
-		FragColor = vec4(1.0); 
+		FragColor = vec4(1.0,1.0,1.0,1.0); 
 	}
 )";
 
@@ -68,7 +68,6 @@ int main() {
 
 
 	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-
 	unsigned int vao = createVAO(vertices, 3);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -81,6 +80,7 @@ int main() {
 
 		glfwSwapBuffers(window);
 	}
+
 	printf("Shutting down...");
 }
 
@@ -88,25 +88,25 @@ int main() {
 //Creates a new vertex array object with vertex data
 unsigned int createVAO(float* vertexData, int numVertices)
 {
+	//Vertex Buffer Object
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//Allocate space for + send vertex data to GPU.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+	
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	//Tell vao to pull vertex data from vbo
 
 	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0); //change to float * 7 for multiple vertex atttributes
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0); //change to float * 7 for multiple vertex atttributes
 	glEnableVertexAttribArray(0);
 
 	//color stuff
 	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
 	//glEnableVertexAttribArray(1);
-
-	//Vertex Buffer Object
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices, vertexData, GL_STATIC_DRAW);
 
 	return vao;
 }
@@ -135,6 +135,7 @@ unsigned int createShader(GLenum shaderType, const char* sourceCode)
 
 	return newShader;
 }
+
 
 //Creates a new shader program with vertex + fragment stages
 //Returns id of new shader program if successful, 0 if failed
