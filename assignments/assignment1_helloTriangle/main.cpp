@@ -62,27 +62,6 @@ int main() {
 		return 1;
 	}
 
-	//Vertex Buffer Object
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	//Tell vao to pull vertex data from vbo
-
-	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)0); //change to float * 7 for multiple vertex atttributes
-	glEnableVertexAttribArray(0);
-
-	//Color attribute
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
-	glEnableVertexAttribArray(1);
-
-
 	//Creates a new vertex array object with vertex data
 	unsigned int createVAO(float* vertexData, int numVertices);
 
@@ -97,7 +76,7 @@ int main() {
 
 
 	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-	//unsigned int vao = createVAO(vertices, 3);
+	unsigned int vao = createVAO(vertices, 7);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -130,20 +109,20 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
-	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //when I change vertices to vertexData the triangle doesn't get drawn
+
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	//Tell vao to pull vertex data from vbo
 
 	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0); //change to float * 7 for multiple vertex atttributes
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0); 
 	glEnableVertexAttribArray(0);
 
-	//color stuff
-	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
-	//glEnableVertexAttribArray(1);
+	//Color attribute
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)(sizeof(float) * 3));
+	glEnableVertexAttribArray(1);
 
 	return vao;
 }
