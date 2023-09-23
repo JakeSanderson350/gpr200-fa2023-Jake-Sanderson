@@ -59,6 +59,7 @@ namespace JSLib
 		return shaderProgram;
 	}
 
+
 	//*************Shader Class*************//
 
 	//Shader Constructor
@@ -81,18 +82,18 @@ namespace JSLib
 	}
 	void Shader::setFloat(const std::string& name, float v) const
 	{
-		glUniform1i(glGetUniformLocation(m_id, name.c_str()), v);
+		glUniform1f(glGetUniformLocation(m_id, name.c_str()), v);
 	}
 	void Shader::setVec2(const std::string& name, float x, float y) const
 	{
-		glUniform2i(glGetUniformLocation(m_id, name.c_str()), x, y);
+		glUniform2f(glGetUniformLocation(m_id, name.c_str()), x, y);
 	}
 	void Shader::setVec3(const std::string& name, float x, float y, float z) const
 	{
-		glUniform3i(glGetUniformLocation(m_id, name.c_str()), x, y, z);
+		glUniform3f(glGetUniformLocation(m_id, name.c_str()), x, y, z);
 	}
 	void Shader::setVec4(const std::string& name, float x, float y, float z, float w) const
 	{
-		glUniform4i(glGetUniformLocation(m_id, name.c_str()), x, y, z, w);
+		glUniform4f(glGetUniformLocation(m_id, name.c_str()), x, y, z, w);
 	}
 }
