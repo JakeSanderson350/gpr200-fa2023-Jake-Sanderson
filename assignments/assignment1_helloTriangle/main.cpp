@@ -109,7 +109,7 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //when I change vertices to vertexData the triangle doesn't get drawn
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //when I change vertices to vertexData nothing gets drawn
 
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
