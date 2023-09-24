@@ -9,29 +9,35 @@
 #include <imgui_impl_opengl3.h>
 #include <JSLib/shader.h>
 
+
+struct Vertex
+{
+	float x, y, z;
+	float u, v;
+};
+
+Vertex vertices[4] = {
+	//x    y    z    u    v
+   { -1.0 , -1.0 , 0.0 , 0.0 , 0.0 }, //Bottom left
+   { 1.0 , -1.0 , 0.0 , 1.0 , 0.0 }, //Bottom right
+   { 1.0 , 1.0 , 0.0 , 1.0 , 1.0 },  //Top right
+   { -1.0 , 1.0 , 0.0 , 0.0 , 1.0 }  //Top left
+};
+
+
+unsigned int indices[6] = {
+	0 , 1 , 2 , //Triangle 1
+	2 , 3 , 0  //Triangle 2
+};
+
+
 unsigned int createShader(GLenum shaderType, const char* sourceCode);
 unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
-unsigned int createVAO(float* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
-
-float vertices[12] = {
-	//x   //y  //z   
-	//Triangle 1
-	-0.5, -0.5, 0.0, 
-	 0.5, -0.5, 0.0,
-	 0.5, 0.5, 0.0,  
-	 //Triangle 2
-	-0.5, 0.5, 0.0,
-};
-
-unsigned int indices[6] = {
-	0 , 1 , 3 , //Triangle 1
-	1 , 2 , 3  //Triangle 2
-};
-
 
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
 float triangleBrightness = 1.0f;
@@ -107,7 +113,7 @@ int main() {
 	printf("Shutting down...");
 }
 
-unsigned int createVAO(float* vertexData, int numVertices, unsigned int* indicesData, int numIndices)
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices)
 {
 	//VAO ID
 	unsigned int vao;
@@ -128,8 +134,12 @@ unsigned int createVAO(float* vertexData, int numVertices, unsigned int* indices
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
 
 	//Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
+
+	//UV
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, u)));
+	glEnableVertexAttribArray(1);
 
 	return vao;
 }
