@@ -31,10 +31,15 @@ unsigned int indices[6] = {
 };
 
 
-unsigned int createShader(GLenum shaderType, const char* sourceCode);
-unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
-unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+float skyTopColor[3] = {0.6f, 0.5f, 0.6f};
+float skyBottomColor[3] = {0.8f, 0.3f, 0.0f};
+
+float sunColor[3] = { 1.0f, 0.2f, 0.3f };
+float sunRad = 0.2f;
+float sunSpeed = 1.0f;
+
+float hill1Color[3] = { 0.2f, 0.5f, 0.2f };
+float hill2Color[3] = { 0.5f, 0.6f, 0.5f };
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
@@ -42,6 +47,13 @@ const int SCREEN_HEIGHT = 720;
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
 float triangleBrightness = 1.0f;
 bool showImGUIDemoWindow = true;
+
+
+unsigned int createShader(GLenum shaderType, const char* sourceCode);
+unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
 
 int main() {
 	printf("Initializing...");
@@ -83,8 +95,15 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Set uniforms
-		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
-		shader.setFloat("_Brightness", triangleBrightness);
+		shader.setFloat("iTime", (float)glfwGetTime());
+		shader.setVec2("iResolution", SCREEN_WIDTH, SCREEN_HEIGHT);
+		shader.setVec3("SkyTopColor", skyTopColor[0], skyTopColor[1], skyTopColor[2]);
+		shader.setVec3("SkyBottomColor", skyBottomColor[0], skyBottomColor[1], skyBottomColor[2]);
+		shader.setVec3("SunColor", sunColor[0], sunColor[1], sunColor[2]);
+		shader.setFloat("SunRad", sunRad);
+		shader.setFloat("SunSpeed", sunSpeed);
+		shader.setVec3("Hill1Color", hill1Color[0], hill1Color[1], hill1Color[2]);
+		shader.setVec3("Hill2Color", hill2Color[0], hill2Color[1], hill2Color[2]);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
@@ -97,8 +116,13 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
-			ImGui::ColorEdit3("Color", triangleColor);
-			ImGui::SliderFloat("Brightness", &triangleBrightness, 0.0f, 1.0f);
+			ImGui::ColorEdit3("Sky Top Color", skyTopColor);
+			ImGui::ColorEdit3("Sky Bottom Color", skyBottomColor);
+			ImGui::ColorEdit3("Sun Color", sunColor);
+			ImGui::SliderFloat("Sun Radius", &sunRad, 0.0f, 2.0f);
+			ImGui::SliderFloat("Sun Speed", &sunSpeed, 0.0f, 10.0f);
+			ImGui::ColorEdit3("Hill 1 Color", hill1Color);
+			ImGui::ColorEdit3("Hill 2 Color", hill2Color);
 			ImGui::End();
 			if (showImGUIDemoWindow) {
 				ImGui::ShowDemoWindow(&showImGUIDemoWindow);
@@ -131,7 +155,7 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 5, vertexData, GL_STATIC_DRAW);
 
 	//Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
