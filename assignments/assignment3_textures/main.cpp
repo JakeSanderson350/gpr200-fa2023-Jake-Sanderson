@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <ew/shader.h>
+#include <JSLib/texture.h>
 
 struct Vertex {
 	float x, y, z;
@@ -59,10 +60,15 @@ int main() {
 	ImGui_ImplOpenGL3_Init();
 
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	shader.use();
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
+	unsigned int brickTexture = loadTexture("assets/bricks.jpg", GL_REPEAT, GL_LINEAR);
 
 	glBindVertexArray(quadVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, brickTexture);
+
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -71,6 +77,8 @@ int main() {
 
 		//Set uniforms
 		shader.use();
+
+		shader.setInt("_Texture", 0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
