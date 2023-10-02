@@ -59,15 +59,26 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	shader.use();
+	ew::Shader backgroundShader("assets/background.vert", "assets/background.frag");
+	ew::Shader characterShader("assets/character.vert", "assets/character.frag");
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
-	unsigned int brickTexture = loadTexture("assets/bricks.jpg", GL_REPEAT, GL_LINEAR);
+	unsigned int backgroundTexture = loadTexture("assets/background.png", GL_REPEAT, GL_LINEAR);
+	unsigned int noiseTexture = loadTexture("assets/noise.png", GL_REPEAT, GL_LINEAR);
+	unsigned int characterTexture = loadTexture("assets/character.png", GL_REPEAT, GL_LINEAR);
 
 	glBindVertexArray(quadVAO);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, brickTexture);
+	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, noiseTexture);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, characterTexture);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 	while (!glfwWindowShouldClose(window)) {
@@ -75,10 +86,19 @@ int main() {
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Set uniforms
-		shader.use();
+		//Background
+		backgroundShader.use();
 
-		shader.setInt("_Texture", 0);
+		//shader.setFloat("iTime", (float)glfwGetTime());
+		backgroundShader.setInt("_BackgroundTexture", 0);
+		backgroundShader.setInt("_NoiseTexture", 1);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+		//Character
+		characterShader.use();
+		
+		characterShader.setInt("_CharacterTexture", 2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
