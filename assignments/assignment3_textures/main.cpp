@@ -68,6 +68,7 @@ int main() {
 	unsigned int characterTexture = loadTexture("assets/character.png", GL_REPEAT, GL_LINEAR);
 
 	glBindVertexArray(quadVAO);
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 
@@ -89,7 +90,7 @@ int main() {
 		//Background
 		backgroundShader.use();
 
-		//shader.setFloat("iTime", (float)glfwGetTime());
+		backgroundShader.setFloat("iTime", (float)glfwGetTime());
 		backgroundShader.setInt("_BackgroundTexture", 0);
 		backgroundShader.setInt("_NoiseTexture", 1);
 
@@ -97,7 +98,8 @@ int main() {
 
 		//Character
 		characterShader.use();
-		
+
+		characterShader.setFloat("iTime", (float)glfwGetTime());
 		characterShader.setInt("_CharacterTexture", 2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);

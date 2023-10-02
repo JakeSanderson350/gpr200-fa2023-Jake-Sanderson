@@ -3,9 +3,13 @@ out vec4 FragColor;
 in vec2 UV;
 
 uniform sampler2D _CharacterTexture;
+uniform float iTime;
 
 
 void main(){
-	FragColor = texture(_CharacterTexture, UV);
-	//FragColor = vec4(FragColor.xyz, 0.5);
+	vec4 color = texture(_CharacterTexture, UV);
+	
+	float t = abs(sin(iTime));
+
+	FragColor = vec4(color.rgb, color.a * t);
 }
