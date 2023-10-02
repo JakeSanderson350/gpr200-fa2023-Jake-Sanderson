@@ -21,6 +21,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+const float TILE = 4.0;
 
 Vertex vertices[4] = {
 	{-1.0, -1.0, 0.0, 0.0, 0.0},
@@ -91,6 +92,7 @@ int main() {
 		backgroundShader.use();
 
 		backgroundShader.setFloat("iTime", (float)glfwGetTime());
+		backgroundShader.setFloat("iTile", TILE);
 		backgroundShader.setInt("_BackgroundTexture", 0);
 		backgroundShader.setInt("_NoiseTexture", 1);
 
