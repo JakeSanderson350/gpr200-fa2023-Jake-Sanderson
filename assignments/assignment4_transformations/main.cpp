@@ -9,8 +9,11 @@
 #include <imgui_impl_opengl3.h>
 
 #include <ew/shader.h>
+#include <JSLib/transformation.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
+
+
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -55,6 +58,8 @@ int main() {
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
+
+	JSLib::Transform transform;
 	
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -66,6 +71,7 @@ int main() {
 		shader.use();
 
 		//TODO: Set model matrix uniform
+		shader.setMat4("_Model", transform.getModelMatrix());
 
 		cubeMesh.draw();
 

@@ -11,7 +11,7 @@ namespace JSLib
 		(
 			1, 0, 0, 0,
 			0, 1, 0, 0,
-			0, 0, 1, 0
+			0, 0, 1, 0,
 			0, 0, 0, 1
 		);
 	};
@@ -35,7 +35,7 @@ namespace JSLib
 		(
 			1, 0, 0, 0,
 			0, cos(rad), -1 * sin(rad), 0,
-			0, sin(rad), cos(rad), 0
+			0, sin(rad), cos(rad), 0,
 			0, 0, 0, 1
 		);
 	};
@@ -47,7 +47,7 @@ namespace JSLib
 		(
 			cos(rad), 0, sin(rad), 0,
 			0, 1, 0, 0,
-			-1 * sin(rad), 0, cos(rad), 0
+			-1 * sin(rad), 0, cos(rad), 0,
 			0, 0, 0, 1
 		);
 	};
@@ -59,7 +59,7 @@ namespace JSLib
 		(
 			cos(rad), -1 * sin(rad), 0, 0,
 			sin(rad), cos(rad), 0, 0,
-			0, 0, 1, 0
+			0, 0, 1, 0,
 			0, 0, 0, 1
 		);
 	};
@@ -71,18 +71,17 @@ namespace JSLib
 		(
 			1, 0, 0, t.x,
 			0, 1, 0, t.y,
-			0, 0, 1, t.z
+			0, 0, 1, t.z,
 			0, 0, 0, 1
 		);
 	};
+
+	struct Transform {
+		ew::Vec3 position = ew::Vec3(0.0f, 0.0f, 0.0f);
+		ew::Vec3 rotation = ew::Vec3(0.0f, 0.0f, 0.0f); //Euler angles (degrees)
+		ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+		ew::Mat4 getModelMatrix() const {
+			return Translate(position) * RotateY(ew::Radians(rotation.y)) * RotateX(ew::Radians(rotation.x)) * RotateZ(ew::Radians(rotation.z)) * Scale(scale);
+		}
+	};
 }
-
-
-struct Transform {
-	ew::Vec3 position = ew::Vec3(0.0f, 0.0f, 0.0f);
-	ew::Vec3 rotation = ew::Vec3(0.0f, 0.0f, 0.0f); //Euler angles (degrees)
-	ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
-	ew::Mat4 getModelMatrix() const {
-		return ew::Translate(position) * ew::RotateY(ew::Radians(rotation.y)) * ew::RotateX(ew::Radians(rotation.x)) * ew::RotateZ(ew::Radians(rotation.z)) * ew::Scale(scale);
-	}
-};
