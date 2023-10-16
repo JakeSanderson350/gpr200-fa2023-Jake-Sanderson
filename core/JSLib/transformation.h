@@ -86,9 +86,9 @@ namespace JSLib
 
 		return ew::Mat4
 		(
-			r.x, r.y, r.z, 0,
-			u.x, u.y, u.z, 0,
-			f.x, f.y, f.x, 0,
+			r.x, r.y, r.z, -1 *	(ew::Dot(r, eye)),
+			u.x, u.y, u.z, -1 *	(ew::Dot(u, eye)),
+			f.x, f.y, f.x, -1 *	(ew::Dot(f, eye)),
 			0, 0, 0, 1
 		);
 			//use ew::Cross for cross product!

@@ -8,9 +8,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include <JSLib/camera.h>
 #include <ew/shader.h>
 #include <ew/procGen.h>
 #include <ew/transform.h>
+
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
