@@ -3,7 +3,7 @@
 #include "../ew/ewMath/vec3.h"
 #include "../ew/ewMath/ewMath.h"
 
-namespace myLib
+namespace JSLib
 {
 	struct Camera
 	{

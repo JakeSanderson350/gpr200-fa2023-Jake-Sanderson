@@ -68,6 +68,20 @@ int main() {
 		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
 	}
 
+	JSLib::Camera cam;
+	cam.position = ew::Vec3(-3, 0, 5);
+	cam.target = ew::Vec3(0, 0, 0);
+	cam.fov = 60;
+	cam.aspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
+	
+	cam.orthographic = true;
+	cam.orthoSize = 6;
+	
+	cam.nearPlane = 0.1;
+	cam.farPlane = 100;
+
+	
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -81,7 +95,7 @@ int main() {
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//Construct model matrix
-			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
+			shader.setMat4("_Model", cam.ProjectionMatrix() * cam.ViewMatrix() * cubeTransforms[i].getModelMatrix());
 			cubeMesh.draw();
 		}
 
@@ -104,6 +118,14 @@ int main() {
 				ImGui::PopID();
 			}
 			ImGui::Text("Camera");
+			ImGui::DragFloat3("Position", &cam.position.x, 0.05f);
+			ImGui::DragFloat3("Target", &cam.target.x, 0.05f);
+			ImGui::DragFloat("FOV", &cam.fov, 1.0f);
+			ImGui::Checkbox("Orthographic", &cam.orthographic);
+			ImGui::DragFloat("Ortho Height", &cam.orthoSize, 0.05f);
+			//ImGui::DragFloat("Near Plane", &cam.nearPlane, 0.05f);
+			//ImGui::DragFloat("Far Plane", &cam.farPlane, 0.05f);
+
 			ImGui::End();
 			
 			ImGui::Render();
