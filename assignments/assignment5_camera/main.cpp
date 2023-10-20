@@ -23,6 +23,96 @@ const int SCREEN_HEIGHT = 720;
 const int NUM_CUBES = 4;
 ew::Transform cubeTransforms[NUM_CUBES];
 
+void moveCamera(GLFWwindow* window, JSLib::Camera* camera, JSLib::CameraControls* controls, float deltaTime)
+{
+	//If right mouse is not held, release cursor and return early.
+	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) 
+	{
+		//Release cursor
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		controls->firstMouse = true;
+		return;
+	}
+	//GLFW_CURSOR_DISABLED hides the cursor, but the position will still be changed as we move our mouse.
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//Get screen mouse position this frame
+	double mouseX, mouseY;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+
+	//If we just started right clicking, set prevMouse values to current position.
+	//This prevents a bug where the camera moves as soon as we click.
+	if (controls->firstMouse) 
+	{
+		controls->firstMouse = false;
+		controls->prevMouseX = mouseX;
+		controls->prevMouseY = mouseY;
+	}
+
+	//TODO: Get mouse position delta for this frame
+	double mouseXDelta = mouseX - controls->prevMouseX;
+	double mouseYDelta = mouseY - controls->prevMouseY;
+
+	//double mouseXDelta = controls->prevMouseX - mouseX;
+	//double mouseYDelta = controls->prevMouseY - mouseY;
+	
+	//TODO: Add to yaw and pitch
+	controls->yaw += (mouseXDelta) * controls->mouseSensitivity;
+	controls->pitch -= (mouseYDelta) * controls->mouseSensitivity;
+	
+	//TODO: Clamp pitch between -89 and 89 degrees
+	if (controls->pitch < -89)
+		controls->pitch = -89;
+	else if (controls->pitch > 89)
+		controls->pitch = 89;
+
+	//Remember previous mouse position
+	controls->prevMouseX = mouseX;
+	controls->prevMouseY = mouseY;
+
+	//Construct forward vector using yaw and pitch. Don't forget to convert to radians!
+	ew::Vec3 forward = ew::Vec3(cos(ew::Radians(controls->yaw)) * cos(ew::Radians(controls->pitch)), 
+								sin(ew::Radians(controls->pitch)), 
+								sin(ew::Radians(controls->yaw)) * cos(ew::Radians(controls->pitch)));
+
+	ew::Vec3 up = ew::Vec3(0, 1, 0);
+
+	ew::Vec3 right = ew::Vec3(ew::Normalize(ew::Cross(forward, up)));
+
+	up = ew::Vec3(ew::Normalize(ew::Cross(right, forward)));
+
+	//Movement controls
+	if (glfwGetKey(window, GLFW_KEY_W)) 
+	{
+		camera->position += forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) 
+	{
+		camera->position -= forward * controls->moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D)) 
+	{
+		camera->position += right * controls->moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A)) 
+	{
+		camera->position -= right * controls->moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E)) 
+	{
+		camera->position += up * controls->moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q)) 
+	{
+		camera->position -= up * controls->moveSpeed;
+	}
+
+	//By setting target to a point in front of the camera along its forward direction, our 
+	//LookAt will be updated accordingly when rendering.
+	camera->target = camera->position + forward;
+}
+
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -69,10 +159,10 @@ int main() {
 	}
 
 	JSLib::Camera cam;
-	cam.position = ew::Vec3(-3, 0, 5);
+	
+	cam.position = ew::Vec3(0, 0, 5);
 	cam.target = ew::Vec3(0, 0, 0);
 	cam.fov = 60;
-	cam.aspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
 	
 	cam.orthographic = true;
 	cam.orthoSize = 6;
@@ -80,13 +170,29 @@ int main() {
 	cam.nearPlane = 0.1;
 	cam.farPlane = 100;
 
-	
+	JSLib::CameraControls camControl;
+
+	float prevTime;
+
+	GLint viewportData[4];
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+
+		//Calculate and pass deltaTime
+		float time = (float)glfwGetTime();
+		float deltaTime = time - prevTime;
+		prevTime = time;
+
+		moveCamera(window, &cam, &camControl, deltaTime);
+
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//Gets current viewport width and height
+		glGetIntegerv(GL_VIEWPORT, viewportData);
+		cam.aspectRatio = (float)viewportData[2] / (float)viewportData[3];
 
 		//Set uniforms
 		shader.use();
@@ -123,8 +229,10 @@ int main() {
 			ImGui::DragFloat("FOV", &cam.fov, 1.0f);
 			ImGui::Checkbox("Orthographic", &cam.orthographic);
 			ImGui::DragFloat("Ortho Height", &cam.orthoSize, 0.05f);
-			//ImGui::DragFloat("Near Plane", &cam.nearPlane, 0.05f);
-			//ImGui::DragFloat("Far Plane", &cam.farPlane, 0.05f);
+			ImGui::DragFloat("Near Plane", &cam.nearPlane, 0.05f);
+			ImGui::DragFloat("Far Plane", &cam.farPlane, 0.05f);
+			ImGui::DragFloat("Yaw", &camControl.yaw, 0.05f);
+			ImGui::DragFloat("Pitch", &camControl.pitch, 0.05f);
 
 			ImGui::End();
 			

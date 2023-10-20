@@ -15,6 +15,6 @@ namespace JSLib
 		if (orthographic)
 			return Orthographic(orthoSize, aspectRatio, nearPlane, farPlane);
 		else
-			return Perspective(fov, aspectRatio, nearPlane, farPlane);
+			return Perspective(ew::Radians(fov), aspectRatio, nearPlane, farPlane);
 	}
 }
