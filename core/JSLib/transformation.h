@@ -86,9 +86,9 @@ namespace JSLib
 
 		return ew::Mat4
 		(
-			r.x, r.y, r.z, -1 *	(ew::Dot(r, eye)),
-			u.x, u.y, u.z, -1 *	(ew::Dot(u, eye)),
-			f.x, f.y, f.x, -1 *	(ew::Dot(f, eye)),
+			r.x, r.y, r.z, -(ew::Dot(r, eye)),
+			u.x, u.y, u.z, -(ew::Dot(u, eye)),
+			f.x, f.y, f.x, -(ew::Dot(f, eye)),
 			0, 0, 0, 1
 		);
 			//use ew::Cross for cross product!
@@ -115,10 +115,12 @@ namespace JSLib
 	//Perspective projection
 	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far)
 	{
+		float c = tan(fov / 2);
+
 		return ew::Mat4
 		(
-			(1 / (tan(fov / 2) * aspect)), 0, 0, 0,
-			0, (1 / tan(fov / 2)), 0, 0,
+			(1 / (c * aspect)), 0, 0, 0,
+			0, (1 / c), 0, 0,
 			0, 0, ((near + far) / (near - far)), ((2 * far * near) / (near - far)),
 			0, 0, -1, 0
 		);

@@ -88,28 +88,61 @@ void moveCamera(GLFWwindow* window, JSLib::Camera* camera, JSLib::CameraControls
 	}
 	if (glfwGetKey(window, GLFW_KEY_S)) 
 	{
-		camera->position -= forward * controls->moveSpeed;
+		camera->position -= forward * controls->moveSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D)) 
 	{
-		camera->position += right * controls->moveSpeed;
+		camera->position += right * controls->moveSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A)) 
 	{
-		camera->position -= right * controls->moveSpeed;
+		camera->position -= right * controls->moveSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_E)) 
 	{
-		camera->position += up * controls->moveSpeed;
+		camera->position += up * controls->moveSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q)) 
 	{
-		camera->position -= up * controls->moveSpeed;
+		camera->position -= up * controls->moveSpeed * deltaTime;
+	}
+
+	//Sprint function
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) 
+	{
+		controls->moveSpeed = 10.0;
+	}
+	else if (controls->moveSpeed != 5.0) 
+	{
+		controls->moveSpeed = 5.0;
 	}
 
 	//By setting target to a point in front of the camera along its forward direction, our 
 	//LookAt will be updated accordingly when rendering.
 	camera->target = camera->position + forward;
+}
+
+void resetCamera(JSLib::Camera* camera, JSLib::CameraControls* controls)
+{
+	camera->position = ew::Vec3(0, 0, 5);
+	camera->target = ew::Vec3(0, 0, 0);
+	camera->fov = 60;
+
+	controls->yaw = -90;
+	controls->pitch = 0;
+}
+
+void cameraInitialize(JSLib::Camera* camera)
+{
+	camera->position = ew::Vec3(0, 0, 5);
+	camera->target = ew::Vec3(0, 0, 0);
+	camera->fov = 60;
+
+	camera->orthographic = true;
+	camera->orthoSize = 6;
+
+	camera->nearPlane = 0.1;
+	camera->farPlane = 100;
 }
 
 
@@ -160,19 +193,11 @@ int main() {
 
 	JSLib::Camera cam;
 	
-	cam.position = ew::Vec3(0, 0, 5);
-	cam.target = ew::Vec3(0, 0, 0);
-	cam.fov = 60;
-	
-	cam.orthographic = true;
-	cam.orthoSize = 6;
-	
-	cam.nearPlane = 0.1;
-	cam.farPlane = 100;
+	cameraInitialize(&cam);
 
 	JSLib::CameraControls camControl;
 
-	float prevTime;
+	float prevTime = 0.0f;
 
 	GLint viewportData[4];
 
@@ -233,6 +258,11 @@ int main() {
 			ImGui::DragFloat("Far Plane", &cam.farPlane, 0.05f);
 			ImGui::DragFloat("Yaw", &camControl.yaw, 0.05f);
 			ImGui::DragFloat("Pitch", &camControl.pitch, 0.05f);
+			
+			if (ImGui::Button("Reset"))
+			{
+				resetCamera(&cam, &camControl);
+			}
 
 			ImGui::End();
 			
