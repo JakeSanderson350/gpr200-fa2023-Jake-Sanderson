@@ -138,11 +138,11 @@ void cameraInitialize(JSLib::Camera* camera)
 	camera->target = ew::Vec3(0, 0, 0);
 	camera->fov = 60;
 
-	camera->orthographic = true;
-	camera->orthoSize = 6;
-
 	camera->nearPlane = 0.1;
 	camera->farPlane = 100;
+
+	camera->orthographic = true;
+	camera->orthoSize = 6;
 }
 
 

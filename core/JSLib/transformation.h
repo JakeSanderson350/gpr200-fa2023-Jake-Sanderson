@@ -116,7 +116,6 @@ namespace JSLib
 	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far)
 	{
 		float c = tan(fov / 2);
-
 		return ew::Mat4
 		(
 			(1 / (c * aspect)), 0, 0, 0,
