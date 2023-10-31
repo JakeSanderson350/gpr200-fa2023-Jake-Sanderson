@@ -11,6 +11,7 @@
 #include <ew/shader.h>
 #include <ew/texture.h>
 #include <ew/procGen.h>
+#include <JSLib/procGen.h>
 #include <ew/transform.h>
 #include <ew/camera.h>
 #include <ew/cameraController.h>
@@ -82,8 +83,16 @@ int main() {
 	ew::MeshData cubeMeshData = ew::createCube(0.5f);
 	ew::Mesh cubeMesh(cubeMeshData);
 
+	//Create plane
+	ew::MeshData planeMeshData = JSLib::createPlane(0.5f, 0.5f, 1);
+	ew::Mesh planeMesh(planeMeshData);
+
 	//Initialize transforms
 	ew::Transform cubeTransform;
+	cubeTransform.position = ew::Vec3(0.0f, 0.0f, 0.0f);
+
+	ew::Transform planeTransform;
+	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
 
 	resetCamera(camera,cameraController);
 
@@ -120,6 +129,10 @@ int main() {
 		//Draw cube
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw plane
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
