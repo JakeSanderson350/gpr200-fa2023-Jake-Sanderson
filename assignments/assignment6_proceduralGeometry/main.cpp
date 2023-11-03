@@ -79,17 +79,23 @@ int main() {
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
-	//Create cube
+	int subDiv = 8;
+
+	//Create cube mesh
 	ew::MeshData cubeMeshData = ew::createCube(0.5f);
 	ew::Mesh cubeMesh(cubeMeshData);
 
-	//Create plane
+	//Create plane mesh
 	ew::MeshData planeMeshData = JSLib::createPlane(0.5f, 0.5f, 5);
 	ew::Mesh planeMesh(planeMeshData);
 
-	//Create cylinder
+	//Create cylinder mesh
 	ew::MeshData cylinderMeshData = JSLib::createCylinder(1.0f, 0.5f, 8);
 	ew::Mesh cylinderMesh(cylinderMeshData);
+
+	//Create sphere mesh
+	ew::MeshData sphereMeshData = JSLib::createSphere(0.5f, 8);
+	ew::Mesh sphereMesh(sphereMeshData);
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
@@ -99,7 +105,10 @@ int main() {
 	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
 
 	ew::Transform cylinderTransform;
-	cylinderTransform.position = ew::Vec3(2.0f, -0.25f, 0.25f);
+	cylinderTransform.position = ew::Vec3(2.5f, 0.0f, 0.0f);
+
+	ew::Transform sphereTransform;
+	sphereTransform.position = ew::Vec3(4.0f, 0.0f, 0.0f);
 
 	resetCamera(camera,cameraController);
 
@@ -144,6 +153,10 @@ int main() {
 		//Draw cylinder
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw sphere
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{

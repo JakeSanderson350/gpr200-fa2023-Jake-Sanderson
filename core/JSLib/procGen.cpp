@@ -3,10 +3,67 @@ namespace JSLib
 {
 	ew::MeshData createSphere(float radius, int numSegments)
 	{
-		int row, col, start;
+		int row, col, start, i;
 		ew::Vertex v;
 		ew::MeshData mesh;
 
+	//Vertices
+		float thetaStep = (2 * ew::PI) / numSegments;
+		float theta;
+		float phiStep = ew::PI / numSegments;
+		float phi;
+
+		for (row = 0; row <= numSegments; row++)
+		{
+			phi = row * phiStep;
+
+			for (col = 0; col <= numSegments; col++)
+			{
+				theta = col * thetaStep;
+
+				v.pos.x = radius * cos(theta) * sin(phi);
+				v.pos.y = radius * cos(phi);
+				v.pos.z = radius * sin(theta) * sin(phi);
+
+				v.normal = ew::Normalize(v.pos);
+
+				v.uv.x = col / (float)numSegments;
+				v.uv.y = row / (float)numSegments;
+
+				mesh.vertices.push_back(v);
+			}
+		}
+
+	//Indices
+		//Top cap
+		int poleStart = 0;
+		int sideStart = numSegments + 1;
+		for (i = 0; i < numSegments; i++)
+		{
+			mesh.indices.push_back(sideStart + i);
+			mesh.indices.push_back(poleStart + i);
+			mesh.indices.push_back(sideStart + i + 1);
+		}
+
+		//Row indices
+		int columns = numSegments + 1;
+		for (row = 1; row < numSegments; row++)
+		{
+			for (col = 0; col < numSegments; col++)
+			{
+				start = row * columns + col;
+
+				//Triangle 1
+				mesh.indices.push_back(start);
+				mesh.indices.push_back(start + 1);
+				mesh.indices.push_back(start + columns);
+
+				//Triangle 2
+				mesh.indices.push_back(start + 1);
+				mesh.indices.push_back(start + columns + 1);
+				mesh.indices.push_back(start + columns);
+			}
+		}
 
 		return mesh;
 	}
@@ -61,7 +118,7 @@ namespace JSLib
 			v.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
 
 			v.uv.x = (cos(theta) + 1) * 0.5;
-			v.uv.y = (sin(theta) + 1) * 0.5;
+			v.uv.y = 1;
 
 			mesh.vertices.push_back(v);
 		}
@@ -78,7 +135,7 @@ namespace JSLib
 			v.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
 
 			v.uv.x = (cos(theta) + 1) * 0.5;
-			v.uv.y = (sin(theta) + 1) * 0.5;
+			v.uv.y = 0;
 
 			mesh.vertices.push_back(v);
 		}
@@ -127,7 +184,7 @@ namespace JSLib
 
 			//Triangle 1
 			mesh.indices.push_back(start);
-			mesh.indices.push_back(start + i);
+			mesh.indices.push_back(start + 1);
 			mesh.indices.push_back(start + columns);
 
 			//Triangle 2
@@ -137,7 +194,15 @@ namespace JSLib
 		}
 
 		//Bottom ring
-		
+		start = ((numSegments + 1) * 3) + 1;
+		center = ((numSegments + 1) * 4) + 1;
+		for (i = 0; i <= numSegments; i++)
+		{
+			mesh.indices.push_back(start + i + 1);
+			mesh.indices.push_back(center);
+			mesh.indices.push_back(start + i);
+			
+		}
 
 		return mesh;
 	}
