@@ -84,8 +84,12 @@ int main() {
 	ew::Mesh cubeMesh(cubeMeshData);
 
 	//Create plane
-	ew::MeshData planeMeshData = JSLib::createPlane(0.5f, 0.5f, 1);
+	ew::MeshData planeMeshData = JSLib::createPlane(0.5f, 0.5f, 5);
 	ew::Mesh planeMesh(planeMeshData);
+
+	//Create cylinder
+	ew::MeshData cylinderMeshData = JSLib::createCylinder(1.0f, 0.5f, 8);
+	ew::Mesh cylinderMesh(cylinderMeshData);
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
@@ -93,6 +97,9 @@ int main() {
 
 	ew::Transform planeTransform;
 	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
+
+	ew::Transform cylinderTransform;
+	cylinderTransform.position = ew::Vec3(2.0f, -0.25f, 0.25f);
 
 	resetCamera(camera,cameraController);
 
@@ -133,6 +140,10 @@ int main() {
 		//Draw plane
 		shader.setMat4("_Model", planeTransform.getModelMatrix());
 		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw cylinder
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
