@@ -15,6 +15,20 @@
 #include <ew/camera.h>
 #include <ew/cameraController.h>
 
+struct Light
+{
+	ew::Vec3 position; //World space
+	ew::Vec3 color; //RGB
+};
+
+struct Material
+{
+	float ambientK; //Ambient coefficient (0-1)
+	float diffuseK; //Diffuse coefficient (0-1)
+	float specular; //Specular coefficient (0-1)
+	float shininess; //Shininess
+};
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 
@@ -76,6 +90,19 @@ int main() {
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
+	//Light initialization
+	Light light;
+	light.position = ew::Vec3(0.0f, 1.0f, 0.0f);
+	light.color = ew::Vec3(1.0f);
+
+	//Material initializations
+	//Intensity coefficients
+	Material mat;
+	mat.diffuseK = 0.4;
+	mat.specular = 0.4;
+	mat.ambientK = 0.2;
+	mat.shininess = 1.0;
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -90,7 +117,7 @@ int main() {
 		cameraController.Move(window, &camera, deltaTime);
 
 		//RENDER
-		glClearColor(bgColor.x, bgColor.y,bgColor.z,1.0f);
+		glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
@@ -111,7 +138,15 @@ int main() {
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw();
 
+		//Intensity coefficients
+		shader.setFloat("_Material.diffuseK", mat.diffuseK);
+		shader.setFloat("_Material.specular", mat.specular);
+		shader.setFloat("_Material.ambientK", mat.ambientK);
+		shader.setFloat("_Material.shininess", mat.shininess);
+
 		//TODO: Render point lights
+		shader.setVec3("_Light.position", light.position);
+		shader.setVec3("_Light.color", light.color);
 
 		//Render UI
 		{
@@ -140,6 +175,10 @@ int main() {
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
+
+			ImGui::DragFloat3("Light Position", &light.position.x, 0.1f);
+			ImGui::DragFloat3("Light Color", &light.color.x, 0.1f);
+
 			ImGui::End();
 			
 			ImGui::Render();
