@@ -93,7 +93,7 @@ int main() {
 	//Light initialization
 	Light light;
 	light.position = ew::Vec3(0.0f, 1.0f, 0.0f);
-	light.color = ew::Vec3(1.0f);
+	light.color = ew::Vec3(1.0f, 0.0f, 0.0f);
 
 	//Material initializations
 	//Intensity coefficients
@@ -138,6 +138,9 @@ int main() {
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw();
 
+		//Camera Position
+		shader.setVec3("camPos", camera.position);
+
 		//Intensity coefficients
 		shader.setFloat("_Material.diffuseK", mat.diffuseK);
 		shader.setFloat("_Material.specular", mat.specular);
@@ -177,7 +180,7 @@ int main() {
 			ImGui::ColorEdit3("BG color", &bgColor.x);
 
 			ImGui::DragFloat3("Light Position", &light.position.x, 0.1f);
-			ImGui::DragFloat3("Light Color", &light.color.x, 0.1f);
+			ImGui::DragFloat3("Light Color", &light.color.x, 0.05f);
 
 			ImGui::End();
 			
