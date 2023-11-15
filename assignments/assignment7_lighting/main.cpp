@@ -35,6 +35,10 @@ void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 int SCREEN_WIDTH = 1080;
 int SCREEN_HEIGHT = 720;
 
+const int MAX_LIGHTS = 4;
+
+int numLights = 4;
+
 float prevTime;
 ew::Vec3 bgColor = ew::Vec3(0.1f);
 
@@ -73,6 +77,7 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
+	ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
 	//Create cube
@@ -91,17 +96,35 @@ int main() {
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
 	//Light initialization
-	Light light;
-	light.position = ew::Vec3(0.0f, 1.0f, 0.0f);
-	light.color = ew::Vec3(1.0f, 0.0f, 0.0f);
+	Light lights[MAX_LIGHTS];
 
+	lights[0].position = ew::Vec3(2.0f, 1.0f, 0.0f);
+	lights[0].color = ew::Vec3(1.0f, 0.0f, 0.0f);
+
+	lights[1].position = ew::Vec3(0.0f, 1.0f, 2.0f);
+	lights[1].color = ew::Vec3(0.0f, 1.0f, 0.0f);
+
+	lights[2].position = ew::Vec3(-2.0f, 1.0f, 0.0f);
+	lights[2].color = ew::Vec3(0.0f, 0.0f, 1.0f);
+
+	lights[3].position = ew::Vec3(0.0f, 1.0f, -2.0f);
+	lights[3].color = ew::Vec3(1.0f, 1.0f, 0.0f);
+
+	ew::Transform lightTransforms[MAX_LIGHTS];
+
+	for (int i = 0; i < MAX_LIGHTS; i++)
+	{
+		lightTransforms[i].position = lights[i].position;
+		lightTransforms[i].scale = ew::Vec3(0.5f);
+	}
+	
 	//Material initializations
 	//Intensity coefficients
 	Material mat;
-	mat.diffuseK = 0.4;
-	mat.specular = 0.4;
-	mat.ambientK = 0.2;
-	mat.shininess = 1.0;
+	mat.ambientK = 0.1;
+	mat.diffuseK = 0.5;
+	mat.specular = 1.0;
+	mat.shininess = 10.0;
 
 	resetCamera(camera,cameraController);
 
@@ -141,6 +164,9 @@ int main() {
 		//Camera Position
 		shader.setVec3("camPos", camera.position);
 
+		//Current number of lights
+		shader.setInt("numLights", numLights);
+
 		//Intensity coefficients
 		shader.setFloat("_Material.diffuseK", mat.diffuseK);
 		shader.setFloat("_Material.specular", mat.specular);
@@ -148,9 +174,29 @@ int main() {
 		shader.setFloat("_Material.shininess", mat.shininess);
 
 		//TODO: Render point lights
-		shader.setVec3("_Light.position", light.position);
-		shader.setVec3("_Light.color", light.color);
+		shader.setVec3("_Lights[0].position", lights[0].position);
+		shader.setVec3("_Lights[0].color", lights[0].color);
 
+		shader.setVec3("_Lights[1].position", lights[1].position);
+		shader.setVec3("_Lights[1].color", lights[1].color);
+
+		shader.setVec3("_Lights[2].position", lights[2].position);
+		shader.setVec3("_Lights[2].color", lights[2].color);
+
+		shader.setVec3("_Lights[3].position", lights[3].position);
+		shader.setVec3("_Lights[3].color", lights[3].color);
+
+		//Draw light sources
+		lightShader.use();
+		lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+		
+		for (int i = 0; i < numLights; i++)
+		{
+			lightShader.setMat4("_Model", lightTransforms[i].getModelMatrix());
+			lightShader.setVec3("_Color", lights[i].color);
+			sphereMesh.draw();
+		}
+		
 		//Render UI
 		{
 			ImGui_ImplGlfw_NewFrame();
@@ -179,8 +225,38 @@ int main() {
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
 
-			ImGui::DragFloat3("Light Position", &light.position.x, 0.1f);
-			ImGui::DragFloat3("Light Color", &light.color.x, 0.05f);
+			//Would open and change all of the lights so you can't change each one individually
+			/*for (int i = 0; i < numLights; i++)
+			{
+				if (ImGui::CollapsingHeader("Light " + std::to_string(i)))
+				{
+					ImGui::DragFloat3("Light Position", &lightTransforms[i].position.x, 0.1f);
+					ImGui::DragFloat3("Light Color", &lights[i].color.x, 0.05f);
+				}
+			}*/
+
+			if (ImGui::CollapsingHeader("Light 1"))
+			{
+				ImGui::DragFloat3("Light Position", &lightTransforms[0].position.x, 0.1f);
+				ImGui::DragFloat3("Light Color", &lights[0].color.x, 0.05f);
+			}
+			if (ImGui::CollapsingHeader("Light 2"))
+			{
+				ImGui::DragFloat3("Light Position", &lightTransforms[1].position.x, 0.1f);
+				ImGui::DragFloat3("Light Color", &lights[1].color.x, 0.05f);
+			}
+			if (ImGui::CollapsingHeader("Light 3"))
+			{
+				ImGui::DragFloat3("Light Position", &lightTransforms[2].position.x, 0.1f);
+				ImGui::DragFloat3("Light Color", &lights[2].color.x, 0.05f);
+			}
+			if (ImGui::CollapsingHeader("Light 4"))
+			{
+				ImGui::DragFloat3("Light Position", &lightTransforms[3].position.x, 0.1f);
+				ImGui::DragFloat3("Light Color", &lights[3].color.x, 0.05f);
+			}
+
+			ImGui::DragInt("Number of Lights", &numLights, 1.0f, 1, MAX_LIGHTS);
 
 			ImGui::End();
 			
