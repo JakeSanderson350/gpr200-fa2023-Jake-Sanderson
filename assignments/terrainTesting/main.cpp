@@ -12,6 +12,7 @@
 #include <ew/texture.h>
 #include <ew/procGen.h>
 #include <JSLib/procGen.h>
+#include <JSLib/terrain.h>
 #include <ew/transform.h>
 #include <ew/camera.h>
 #include <ew/cameraController.h>
@@ -86,9 +87,15 @@ int main() {
 	ew::MeshData planeMeshData = JSLib::createPlane(5.0f, 5.0f, 256);
 	ew::Mesh planeMesh(planeMeshData);
 
+	ew::MeshData terrainMeshData = JSLib::createTerrain(5.0f, 5.0f, 256, "assets/heightmap01.jpg");
+	ew::Mesh terrainMesh(terrainMeshData);
+
 	//Initialize transforms
 	ew::Transform planeTransform;
-	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
+	planeTransform.position = ew::Vec3(10.0f, -0.25f, 0.25f);
+
+	ew::Transform terrainTransform;
+	terrainTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
 
 
 	resetCamera(camera,cameraController);
@@ -127,6 +134,9 @@ int main() {
 		//Draw plane
 		shader.setMat4("_Model", planeTransform.getModelMatrix());
 		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		shader.setMat4("_Model", terrainTransform.getModelMatrix());
+		terrainMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
