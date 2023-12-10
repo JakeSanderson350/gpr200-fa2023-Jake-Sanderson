@@ -20,10 +20,6 @@ namespace JSLib
 				unsigned char* texel = data + (col + width * row) * numComponents;
 				unsigned char y = texel[0];
 
-				/*v.pos.x = width * (col / (float)subdivisions);
-				v.pos.y = (int)y;
-				v.pos.z = -height * (row / (float)subdivisions);*/
-
 				v.pos.x = -height / 2.0f + row;
 				v.pos.y = (int)y * yScale - yShift;
 				v.pos.z = -width / 2.0f + col;
@@ -40,36 +36,29 @@ namespace JSLib
 		stbi_image_free(data);
 
 		//Indices
-		int columns = width ;
+		int indBottomLeft, indTopLeft, indTopRight, indBottomRight;
 
 		for (row = 0; row < height - 1; row++)
 		{
-			for (col = 0; col < width; col++)
+			for (col = 0; col < width - 1; col++)
 			{
-				start = row * columns + col;
-
-				//Bottom right triangle
-				mesh.indices.push_back(start);
-				mesh.indices.push_back(start + 1);
-				mesh.indices.push_back(start + columns + 1);
+				//Indices for each quad
+				indBottomLeft = row * width + col;
+				indTopLeft = (row + 1) * width + col;
+				indTopRight = (row + 1) * width + col + 1;
+				indBottomRight = row * width + col + 1;
 
 				//Top left triangle
-				mesh.indices.push_back(start);
-				mesh.indices.push_back(start + columns + 1);
-				mesh.indices.push_back(start + columns);
+				mesh.indices.push_back(indBottomLeft);
+				mesh.indices.push_back(indTopRight);
+				mesh.indices.push_back(indTopLeft);
+
+				//Bottom right triangle
+				mesh.indices.push_back(indBottomLeft);
+				mesh.indices.push_back(indBottomRight);
+				mesh.indices.push_back(indTopRight);
 			}
 		}
-
-		/*for (row = 0; row < height - 1; row++)
-		{
-			for (col = 0; col < width; col++)
-			{
-				for (start = 0; start < 2; start++)
-				{
-					mesh.indices.push_back(col + width * (row + start));
-				}
-			}
-		}*/
 
 		return mesh;
 	}

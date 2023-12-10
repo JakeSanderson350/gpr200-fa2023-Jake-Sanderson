@@ -87,7 +87,7 @@ int main() {
 	ew::MeshData planeMeshData = JSLib::createPlane(5.0f, 5.0f, 256);
 	ew::Mesh planeMesh(planeMeshData);
 
-	ew::MeshData terrainMeshData = JSLib::createTerrain(5.0f, 5.0f, 256, "assets/heightmap01.jpg");
+	ew::MeshData terrainMeshData = JSLib::createTerrain(5.0f, 5.0f, 256, "assets/heightmap02.jpg");
 	ew::Mesh terrainMesh(terrainMeshData);
 
 	//Initialize transforms
