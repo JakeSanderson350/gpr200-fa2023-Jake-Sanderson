@@ -4,5 +4,5 @@
 #include "../ew/external/glad.h"
 namespace JSLib
 {
-	ew::MeshData createTerrain(float width, float height, int subdivisions, char* heightMap);
+	ew::MeshData createTerrain(char* heightMap);
 }

@@ -1,7 +1,7 @@
 #include "terrain.h"
 namespace JSLib
 {
-	ew::MeshData createTerrain(float width1, float height1, int subdivisions, char* heightMap)
+	ew::MeshData createTerrain(char* heightMap)
 	{
 		int row, col, start;
 		ew::Vertex v;

@@ -78,24 +78,18 @@ int main() {
 	glPolygonMode(GL_FRONT_AND_BACK, appSettings.wireframe ? GL_LINE : GL_FILL);
 
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
+	unsigned int snowTexture = ew::loadTexture("assets/snow_color.jpg",GL_REPEAT,GL_LINEAR);
+	unsigned int grassTexture = ew::loadTexture("assets/grass_color.jpg", GL_REPEAT, GL_LINEAR);
+	unsigned int rockTexture = ew::loadTexture("assets/rock_color.jpg", GL_REPEAT, GL_LINEAR);
 	unsigned int heightTexture = ew::loadTexture("assets/heightmap01.jpg", GL_REPEAT, GL_LINEAR);
 
-	int subDiv = 8;
-
-	//Create plane mesh
-	ew::MeshData planeMeshData = JSLib::createPlane(5.0f, 5.0f, 256);
-	ew::Mesh planeMesh(planeMeshData);
-
-	ew::MeshData terrainMeshData = JSLib::createTerrain(5.0f, 5.0f, 256, "assets/heightmap02.jpg");
+	//Create terrain mesh
+	ew::MeshData terrainMeshData = JSLib::createTerrain("assets/heightmap03.jpg");
 	ew::Mesh terrainMesh(terrainMeshData);
 
 	//Initialize transforms
-	ew::Transform planeTransform;
-	planeTransform.position = ew::Vec3(10.0f, -0.25f, 0.25f);
-
 	ew::Transform terrainTransform;
-	terrainTransform.position = ew::Vec3(1.0f, -0.25f, 0.25f);
+	terrainTransform.position = ew::Vec3(0.0f, 0.0f, 0.0f);
 
 
 	resetCamera(camera,cameraController);
@@ -119,9 +113,19 @@ int main() {
 		
 
 		shader.use();
-		glBindTexture(GL_TEXTURE_2D, brickTexture);
-		shader.setInt("_TextureBrick", 0);
-		shader.setInt("_Heightmap01", 1);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, snowTexture);
+		shader.setInt("_TextureSnow", 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, grassTexture);
+		shader.setInt("_TextureGrass", 1);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, rockTexture);
+		shader.setInt("_TextureRock", 2);
+
 		shader.setInt("_Mode", appSettings.shadingModeIndex);
 		shader.setVec3("_Color", appSettings.shapeColor);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
@@ -131,10 +135,7 @@ int main() {
 		ew::Vec3 lightF = ew::Vec3(sinf(lightRot.y) * cosf(lightRot.x), sinf(lightRot.x), -cosf(lightRot.y) * cosf(lightRot.x));
 		shader.setVec3("_LightDir", lightF);
 
-		//Draw plane
-		shader.setMat4("_Model", planeTransform.getModelMatrix());
-		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
-
+		//Draw terrain
 		shader.setMat4("_Model", terrainTransform.getModelMatrix());
 		terrainMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
