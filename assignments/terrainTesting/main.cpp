@@ -84,12 +84,12 @@ int main() {
 	unsigned int heightTexture = ew::loadTexture("assets/heightmap01.jpg", GL_REPEAT, GL_LINEAR);
 
 	//Create terrain mesh
-	ew::MeshData terrainMeshData = JSLib::createTerrain("assets/heightmap03.jpg");
-	ew::Mesh terrainMesh(terrainMeshData);
+	//ew::MeshData terrainMeshData = JSLib::createTerrain("assets/heightmap03.jpg");
+	ew::Mesh terrainMesh(JSLib::createTerrain("assets/heightmap02.jpg"));
 
-	ew::Mesh sphereMesh(ew::createSphere(0.5f, 64));
+	/*ew::Mesh sphereMesh(ew::createSphere(0.5f, 64));
 	ew::Transform sphereTransform;
-	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
+	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);*/
 
 	//Initialize transforms
 	ew::Transform terrainTransform;
@@ -143,7 +143,7 @@ int main() {
 		shader.setMat4("_Model", terrainTransform.getModelMatrix());
 		terrainMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
-		sphereMesh.draw();
+		//sphereMesh.draw();
 
 		//Render UI
 		{
