@@ -79,7 +79,7 @@ void main(){
 	}
 	else if (_Mode == 1){
 		vec3 normal = normalize(Normal);
-		FragColor = vec4(abs(normal),1.0);
+		FragColor = vec4(normal,1.0);
 	}
 	else if (_Mode == 2){
 		FragColor = vec4(UV,0.0,1.0);
@@ -97,7 +97,8 @@ void main(){
 		FragColor = vec4(col,1.0);
 	}else if (_Mode == 5){
 		vec3 normal = normalize(Normal);
-		vec3 col = texture(_TextureSnow,UV).rgb * calcLight(normal);
+		float scale = (WorldPos.y + 16) / 62.0f;
+		vec3 col = heightBasedTexture(scale).rgb * calcLight(normal);
 		FragColor = vec4(col,1.0);
 	}
 }

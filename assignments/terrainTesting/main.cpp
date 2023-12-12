@@ -87,6 +87,10 @@ int main() {
 	ew::MeshData terrainMeshData = JSLib::createTerrain("assets/heightmap03.jpg");
 	ew::Mesh terrainMesh(terrainMeshData);
 
+	ew::Mesh sphereMesh(ew::createSphere(0.5f, 64));
+	ew::Transform sphereTransform;
+	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
+
 	//Initialize transforms
 	ew::Transform terrainTransform;
 	terrainTransform.position = ew::Vec3(0.0f, 0.0f, 0.0f);
@@ -138,6 +142,8 @@ int main() {
 		//Draw terrain
 		shader.setMat4("_Model", terrainTransform.getModelMatrix());
 		terrainMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		sphereMesh.draw();
 
 		//Render UI
 		{

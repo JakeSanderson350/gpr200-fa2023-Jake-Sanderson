@@ -24,7 +24,7 @@ namespace JSLib
 				v.pos.y = (int)y * yScale - yShift;
 				v.pos.z = -width / 2.0f + col;
 
-				v.normal = ew::Vec3(0.0f, 1.0f, 0.0f);
+				v.normal = ew::Vec3(0.0f, 0.0f, 0.0f);
 
 				v.uv.x = col / (float)height;
 				v.uv.y = row / (float)width;
@@ -59,6 +59,30 @@ namespace JSLib
 				mesh.indices.push_back(indTopRight);
 			}
 		}
+
+		//Normals
+		for (int i = 0; i < mesh.indices.size(); i += 3)
+		{
+			int ind0 = mesh.indices[i];
+			int ind1 = mesh.indices[i + 1];
+			int ind2 = mesh.indices[i + 2];
+
+			ew::Vec3 v1 = mesh.vertices[ind1].pos - mesh.vertices[ind0].pos;
+			ew::Vec3 v2 = mesh.vertices[ind2].pos - mesh.vertices[ind0].pos;
+
+			ew::Vec3 normal = ew::Normalize(ew::Cross(v1, v2));
+
+			mesh.vertices[ind0].normal += normal;
+			mesh.vertices[ind1].normal += normal;
+			mesh.vertices[ind2].normal += normal;
+		}
+
+		for (int i = 0; i < mesh.vertices.size(); i++)
+		{
+			mesh.vertices[i].normal = ew::Normalize(mesh.vertices[i].normal);
+			//mesh.vertices[i].normal = ew::Vec3(0, 0.0, 1);
+		}
+
 
 		return mesh;
 	}
