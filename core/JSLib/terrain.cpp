@@ -17,11 +17,12 @@ namespace JSLib
 		{
 			for (col = 0; col < width; col++)
 			{
+				//Get texel for where current vertex is at and get its pixel data
 				unsigned char* texel = data + (col + width * row) * numComponents;
 				unsigned char y = texel[0];
 
 				v.pos.x = -height / 2.0f + row;
-				v.pos.y = (int)y * yScale - yShift;
+				v.pos.y = (int)y * yScale;
 				v.pos.z = -width / 2.0f + col;
 
 				v.normal = ew::Vec3(0.0f, 0.0f, 0.0f);
@@ -63,15 +64,19 @@ namespace JSLib
 		//Normals
 		for (int i = 0; i < mesh.indices.size(); i += 3)
 		{
+			//Gets indices of the three points of a triangle
 			int ind0 = mesh.indices[i];
 			int ind1 = mesh.indices[i + 1];
 			int ind2 = mesh.indices[i + 2];
 
+			//Makes two vectors from the three points
 			ew::Vec3 v1 = mesh.vertices[ind1].pos - mesh.vertices[ind0].pos;
 			ew::Vec3 v2 = mesh.vertices[ind2].pos - mesh.vertices[ind0].pos;
 
+			//Calculates their norm
 			ew::Vec3 normal = ew::Normalize(ew::Cross(v1, v2));
 
+			//Adds to vertices normals
 			mesh.vertices[ind0].normal += normal;
 			mesh.vertices[ind1].normal += normal;
 			mesh.vertices[ind2].normal += normal;
@@ -80,9 +85,7 @@ namespace JSLib
 		for (int i = 0; i < mesh.vertices.size(); i++)
 		{
 			mesh.vertices[i].normal = ew::Normalize(mesh.vertices[i].normal);
-			//mesh.vertices[i].normal = ew::Vec3(0, 0.0, 1);
 		}
-
 
 		return mesh;
 	}

@@ -14,5 +14,7 @@ void main(){
 	Normal = vNormal;
 	UV = vUV;
 	gl_Position = _ViewProjection * _Model * vec4(vPos,1.0);
+
+	//Terrain
 	WorldPos = (_Model * vec4(vPos,1.0)).xyz;
 }
