@@ -136,7 +136,7 @@ int main() {
 		shader.use();
 
 	//Terrain
-		terMinY = abs(terrainTransform.position.y);
+		terMinY = terrainTransform.position.y;
 		terMaxY = terrainTransform.position.y + (64.0f * terrainTransform.scale.y);
 
 		glActiveTexture(GL_TEXTURE0);

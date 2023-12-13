@@ -104,7 +104,7 @@ void main(){
 	//Terrain
 		//Gets y cord of vertex positions and puts it on a scale 
 		//of 0-1 based on how high up it is in the terrain
-		float scale = (WorldPos.y + _terMinY) / (abs(_terMinY) + abs(_terMaxY));
+		float scale = abs(WorldPos.y - _terMinY) / (abs(_terMaxY - _terMinY));
 
 		FragColor = heightBasedTexture(scale);
 	//
